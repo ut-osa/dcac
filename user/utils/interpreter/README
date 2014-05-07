@@ -1,0 +1,35 @@
+1. Write a small "dcac script" (see sample_script for example)
+2. run
+   ./interpreter <dcac script> [<the program to run. default: bash>]
+
+Then the program will start in the environment specified in the script.
+If you need to pass arguments to the program, use quotes to include
+the program and all arguments as a single argument to interpreter.
+
+
+sample_script_1:
+
+add_uname            // add u.1000, 1000 is the current uid
+add u.1000.a         // add u.1000.a
+drop u.1000          // drop u.1000
+set_def_wr u.1000.a|u.1000.b   // default write acl : u.1000.a|u.1000.b
+mask 555             // mask : readonly, clear UID-bit (If you want UID-bit,
+                     //      use 1555).
+lock                 // lock the DCAC state such that it won't change until
+                     //   unlock
+
+(You can first change 555 to 777, start a bash from it, and create a directory
+ "dir". Then change back to 555, start a bash; now you can only write to the
+ "dir" directory.)
+
+
+sample_script_2:
+set_file_wr file1 u.alice.test   //  change ACL of file1
+set_file_wr_reset file2 u.alice.test // change ACL of file2, and reset after
+                                     // the target program terminates.
+fork              // fork a child to process the next commands and the target
+                  // program. The parent will not execute them, thus will not
+                  // be confined, and will be able to reset ACL of file2.
+add u.alice.test  // assume you have u.alice, now add a child
+drop u.alice
+mask 555

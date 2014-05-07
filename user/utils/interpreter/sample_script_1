@@ -1,0 +1,5 @@
+add_uname
+add u.1000
+drop u.1000
+set_def_wr u.1000.a|u.1000.b
+mask 555

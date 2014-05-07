@@ -1,0 +1,20 @@
+Kernel patch:
+
+This patch incorporates modified NFSv3XATTR patch (http://namei.org/nfsv3xattr/).
+
+Download the kernel source and apply the patch. You need to enable these options:
+  - NFS_V3_XATTR_API
+  - NFS_V3_XATTR
+  - NFSD_V3_XATTR.
+  - SECURITY_DCAC
+  - SECURITY_DCAC_INODE_CACHE
+  - DEFAULT_SECURITY_DCAC
+
+nfs-utils, (from http://namei.org/nfsv3xattr/):
+Apply the patch to nfs-utils, and use it to mount an NFS with options:
+  -o vers=3,[nolock,]xattr,xattrsec
+
+System binary patches:
+Patch shadow, openssh and/or lightdm, such that they can initialize attributes
+when a user logs in. You can also find the deb packages in this repository.
+

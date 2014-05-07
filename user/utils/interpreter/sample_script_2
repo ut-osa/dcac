@@ -1,0 +1,6 @@
+set_file_wr file1 u.alice.test
+set_file_wr_reset file2 u.alice.test
+fork
+add u.alice.test
+drop u.alice
+mask 555

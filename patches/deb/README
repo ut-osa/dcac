@@ -1,0 +1,3 @@
+DCAC patches are applied to the packages in this directory.
+
+You can install lightdm and openssh, and they will initialize the attribute set when you log in.

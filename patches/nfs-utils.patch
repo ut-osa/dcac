@@ -1,0 +1,45 @@
+diff --git a/utils/mount/nfs_mount.h b/utils/mount/nfs_mount.h
+index 2becfb1..625148f 100644
+--- a/utils/mount/nfs_mount.h
++++ b/utils/mount/nfs_mount.h
+@@ -65,6 +65,8 @@ struct nfs_mount_data {
+ #define NFS_MOUNT_SECFLAVOUR	0x2000	/* 5 */
+ #define NFS_MOUNT_NORDIRPLUS	0x4000	/* 5 */
+ #define NFS_MOUNT_UNSHARED	0x8000	/* 5 */
++#define NFS_MOUNT_NOXATTR	0x10000 /* 6 */
++#define NFS_MOUNT_XATTR_SEC	0x20000 /* 6 */
+ 
+ /* security pseudoflavors */
+ 
+diff --git a/utils/mount/nfsmount.c b/utils/mount/nfsmount.c
+index 6b3356c..ed1cd3a 100644
+--- a/utils/mount/nfsmount.c
++++ b/utils/mount/nfsmount.c
+@@ -433,6 +433,16 @@ parse_options(char *old_opts, struct nfs_mount_data *data,
+ 				if (!val)
+ 					data->flags |= NFS_MOUNT_UNSHARED;
+ #endif
++#if NFS_MOUNT_VERSION >= 6
++			} else if (!strcmp(opt, "xattr")) {
++				data->flags &= ~NFS_MOUNT_NOXATTR;
++				if (!val)
++					data->flags |= NFS_MOUNT_NOXATTR;
++			} else if (!strcmp(opt, "xattrsec")) {
++				data->flags &= ~NFS_MOUNT_XATTR_SEC;
++				if (val)
++					data->flags |= NFS_MOUNT_XATTR_SEC;
++#endif
+ 			} else {
+ 			bad_option:
+ 				if (sloppy)
+@@ -628,6 +638,10 @@ nfsmount(const char *spec, const char *node, int flags,
+ 	printf(_(", sec = %u"), data.pseudoflavor);
+ 	printf(_(", readdirplus = %d"), (data.flags & NFS_MOUNT_NORDIRPLUS) != 0);
+ #endif
++#if NFS_MOUNT_VERSION >= 6
++	printf(_(", noxattr = %d"), (data.flags & NFS_MOUNT_NOXATTR) != 0);
++	printf(_(", xattrsec = %d"), (data.flags & NFS_MOUNT_XATTR_SEC) != 0);
++#endif
+ 	printf("\n");
+ #endif
+ 

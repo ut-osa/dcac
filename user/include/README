@@ -1,0 +1,59 @@
+API:
+
+1. dcac_add_uname_attr     dcac_add_gname_attr
+    If you haven't installed the modified login, sshd, or lightdm, your
+    processes get empty initial attribute set. In that case, you can use
+    the two functions to add u.<uid> or g.<gid>, like u.1000, and once
+    the process drops that, it cannot add back.
+
+2.int dcac_add_any_attr(const char *attr, int flags)
+    This function can add an attr represented by a string. (flags: DCAC_ADDONLY or
+        DCAC_ADDMOD)
+    Root user can use this function to add any attribute. Regular user can also
+    use this function to add an attribute that would be allowed by an openat
+    call.
+    Return 0 on success.
+
+3. int dcac_set_def_rd/wr/ex/mdacl(char *acl)
+    set default acls (access modes) for the process.
+    input: string such as "u.alice|g.student&g.photo"
+    Return 0 on success.
+
+    Note that this ACL applies to all objects that might be created,
+    (e.g. semaphores), not just files.
+
+4. int dcac_set_attr_acl(int afd, int ffd, const char *addacl, const char
+        *modacl)
+    Create a gateway. afd is the attr's fd, ffd is the gateway file's fd.
+    Return 0 on success.
+
+    To use these gateways, open the gateway file and add the
+    DCAC_ADDONLY or DCAC_ADDMOD flags to the flags for open.  See the
+    gateway test in the DCAC test suite for an example.
+
+5. int dcac_set_file_rd/wr/ex/mdacl(int fd, const char *acl)
+    Set the rd/wr/ex/md access mode for file fd.
+    Return 0 on success.
+
+6. int dcac_get_attr_fd(const char *attr)
+Return the FD of this attribute. (Negative if not exist)
+
+7. int dcac_get_attr_name(int fd, char *buf, int bufsize)
+    Store the string representation of the attr associated with fd.
+    Return 0 on success, -ERANGE if bufsize is too small, -ENODATA
+    if the fd is not an attr.
+
+8. int dcac_get_attr_fd_list(int *buf, int bufsize)
+    An array of fd's representing the attrs will be stored in buf.
+    Return the number of attributes on success; -ERANGE if bufsize is too small.
+
+9. void dcac_set_mask(unsigned short mask)
+    set pmask = pmaks&mask
+    Note that UID-bit is the 9th bit of pmask (counting from LSB as 0).
+
+10. unsigned short dcac_get_mask(void)
+    returns the pmask
+
+11. void dcac_lockdown(void) / dcac_unlock(void)
+    lock/unlock the DCAC state. The lock prevents the process unintentionally
+    changes the DCAC states (e.g. close an attr).
